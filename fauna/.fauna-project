@@ -1,0 +1,5 @@
+default=default
+
+[environment.default]
+endpoint=cloud-us
+database=ColaCoin

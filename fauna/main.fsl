@@ -1,0 +1,9 @@
+collection User {
+  name: String
+  balance: Number
+}
+
+collection Voucher {
+  creator: Ref<User>
+  amount: Number
+}
