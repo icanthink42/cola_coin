@@ -4,6 +4,5 @@ collection User {
 }
 
 collection Voucher {
-  creator: Ref<User>
   amount: Number
 }
