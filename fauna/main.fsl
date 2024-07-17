@@ -5,6 +5,10 @@ collection Account {
   discord_id: String
 
   check balance_positive (.balance >= 0)
+
+  index byDiscordId {
+    terms [.discord_id]
+  }
 }
 
 collection Voucher {
@@ -54,6 +58,22 @@ function create_user(id: String, name: String): Account {
 }
 function create_token(account: Account): String {
   Token.create({ document: account }).secret!
+}
+
+// Called from a slash command to pay a user from another user.
+@role(admin)
+function pay_user(from: String, to: String, amount: Number): Null {
+  let from = Account.byDiscordId(from).first()
+  if (from == null) {
+    abort({ code: "no_account", message: "No such account with ID #{from}" })
+  }
+
+  let to = Account.byDiscordId(to).first()
+  if (to == null) {
+    abort({ code: "no_account", message: "No such account with ID #{to}" })
+  }
+
+  pay_admin(from!, to!, amount)
 }
 
 @role(admin)
