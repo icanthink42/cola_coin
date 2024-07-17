@@ -114,6 +114,15 @@ function discord_account(id: String): Account {
   account!
 }
 
+function lookup_company(name: String): Company {
+  let company = Company.byName(name).first()
+  if (company == null) {
+    abort({ code: "no_company", message: "The company #{name} does not exist." })
+  }
+
+  company!
+}
+
 function cc_str(amount: Number): String {
   let amount_str = amount.toString()
 

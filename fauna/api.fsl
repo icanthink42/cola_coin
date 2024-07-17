@@ -44,8 +44,9 @@ function create_company(creator: String, name: String, shares: Number): Account 
 }
 
 // Sell shares of a company.
-function sell_shares(account: String, company: Company, amount: Number, price: Number): Order {
+function sell_shares(account: String, company: String, amount: Number, price: Number): Order {
   let account = discord_account(account)
+  let company = lookup_company(company)
 
   if (amount < 0) {
     abort({ code: "invalid_amount", message: "Cannot sell a negative amount of shares." })
