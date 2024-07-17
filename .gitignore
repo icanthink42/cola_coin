@@ -1,2 +1,4 @@
 discord_token.txt
 fauna_token.txt
+.venv
+__pycache__
