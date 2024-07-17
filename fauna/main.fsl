@@ -145,6 +145,15 @@ function sell_shares(account: String, company: Company, amount: Number, price: N
   Order.create({ kind: "sell", amount: amount, price: price, company: company })
 }
 
+function list_orders(company: String): Array<Order> {
+  let company = Company.byName("foo").first()
+  if (company == null) {
+    abort({ code: "no_company", message: "Company not found." })
+  }
+
+  Order.byCompany(company!).toArray()
+}
+
 @role(admin)
 function discord_account(id: String): Account {
   let account = Account.byDiscordId(id).first()
