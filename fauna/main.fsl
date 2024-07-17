@@ -2,14 +2,30 @@ collection Account {
   name: String
   balance: Number
 
-  discord_id: String
+  discord_id: String?
+  company: Ref<Company>?
 
   check balance_positive (.balance >= 0)
+  check company_or_discord_id (.company != null || .discord_id != null)
 
   index byDiscordId {
     terms [.discord_id]
   }
-  unique [.discord_id]
+  unique [.discord_id, .company]
+}
+
+collection Company {
+  account: Ref<Account>
+  share_owners: { *: Number }
+
+  check share_owners_positive (doc => {
+    Object.values(doc.share_owners).every(x => x >= 0)
+  })
+  check share_owners_exist (doc => {
+    Object.keys(doc.share_owners).every(x => Account(ID(x)).exists())
+  })
+
+  unique [.account]
 }
 
 collection Voucher {
@@ -56,6 +72,18 @@ function redeem_voucher(voucher: Ref<Voucher>): Null {
 
 function create_user(id: String, name: String): Account {
   Account.create({ name: name, balance: 0, discord_id: id })
+}
+function create_company(creator: String, name: String, shares: Number): Account {
+  let creator = discord_account(creator)
+
+  let share_owners = Object.fromEntries([[creator.id.toString(), shares]])
+
+  let account = Account(newId())
+
+  let company = Company.create({ account: account, share_owners: share_owners })
+  let account = Account.create({ id: account.id, name: name, balance: 0, company: company })
+
+  account
 }
 function create_token(account: Account): String {
   Token.create({ document: account }).secret!
