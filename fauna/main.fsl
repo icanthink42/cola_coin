@@ -19,23 +19,34 @@ role account {
   membership Account
 }
 
-function pay(to: Account, amount: Number): Null {
+@role(admin)
+function pay(to: Ref<Account>, amount: Number): Null {
+  let to: Ref<Account> = to // FIXME: Remove once typechecking bug is fixed.
+
   let identity: Any = Query.identity()
   if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
+  if (!to.exists()) abort({ code: "no_account", message: "The account doesn't exist" })
 
-  pay_admin(identity, to, amount)
+  pay_admin(identity, to!, amount)
 }
+
+@role(admin)
 function create_voucher(amount: Number): Null {
   let identity: Any = Query.identity()
   if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
 
   create_voucher_admin(identity, amount)
 }
-function redeem_voucher(voucher: Voucher): Null {
+
+@role(admin)
+function redeem_voucher(voucher: Ref<Voucher>): Null {
+  let voucher: Ref<Voucher> = voucher // FIXME: Remove once typechecking bug is fixed.
+
   let identity: Any = Query.identity()
   if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
+  if (!voucher.exists()) abort({ code: "no_voucher", message: "The voucher doesn't exist" })
 
-  redeem_voucher_admin(identity, voucher)
+  redeem_voucher_admin(identity, voucher!)
 }
 
 function create_user(id: String, name: String): Account {
