@@ -33,6 +33,21 @@ collection Company {
   unique [.account]
 }
 
+collection Order {
+  kind: "buy" | "sell"
+  amount: Number
+  price: Number
+  company: Ref<Company>
+
+  check amount_positive (.amount > 0)
+  check amount_int (doc => doc.amount == Math.floor(doc.amount))
+  check price_positive (.price > 0)
+
+  index byCompany {
+    terms [.company]
+  }
+}
+
 collection Voucher {
   amount: Number
 }
@@ -100,6 +115,34 @@ function create_company(creator: String, name: String, shares: Number): Account 
 }
 function create_token(account: Account): String {
   Token.create({ document: account }).secret!
+}
+
+function effective_shares_owned(account: Account, company: Company): Number {
+  let company: Company = company // FIXME
+
+  let actual_shares_owned = company.share_owners[account.id.toString()] ?? 0
+
+  Order.byCompany(company)
+    .where(.kind == "sell")
+    .fold(actual_shares_owned, (acc, order) => acc - order.amount)
+}
+
+function sell_shares(account: String, company: Company, amount: Number, price: Number): Order {
+  let account = discord_account(account)
+
+  if (amount < 0) {
+    abort({ code: "invalid_amount", message: "Cannot sell a negative amount of shares." })
+  }
+  if (price < 0) {
+    abort({ code: "invalid_price", message: "Cannot sell shares for a negative price." })
+  }
+
+  let shares_owned = effective_shares_owned(account, company)
+  if (shares_owned < amount) {
+    abort({ code: "low_shares", message: "Not enough shares to sell." })
+  }
+
+  Order.create({ kind: "sell", amount: amount, price: price, company: company })
 }
 
 @role(admin)
