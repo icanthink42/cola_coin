@@ -61,31 +61,27 @@ function create_token(account: Account): String {
   Token.create({ document: account }).secret!
 }
 
+@role(admin)
+function discord_account(id: String): Account {
+  let account = Account.byDiscordId(id).first()
+  if (account == null) {
+    abort({ code: "no_account", message: "No such account with ID #{id}" })
+  }
+
+  account!
+}
+
 // Called from a slash command to pay a user from another user.
 @role(admin)
 function pay_user(from: String, to: String, amount: Number): Null {
-  let from = Account.byDiscordId(from).first()
-  if (from == null) {
-    abort({ code: "no_account", message: "No such account with ID #{from}" })
-  }
-
-  let to = Account.byDiscordId(to).first()
-  if (to == null) {
-    abort({ code: "no_account", message: "No such account with ID #{to}" })
-  }
-
-  pay_admin(from!, to!, amount)
+  pay_admin(discord_account(from), discord_account(to), amount)
 }
+
 
 // Get the balance of an account. Any authorized user can read any account's balance.
 @role(admin)
 function balance(user: String): Number {
-  let account = Account.byDiscordId(user).first()
-  if (account == null) {
-    abort({ code: "no_account", message: "No such account with ID #{user}" })
-  }
-
-  account!.balance
+  discord_account(user).balance
 }
 
 @role(admin)
