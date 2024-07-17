@@ -65,10 +65,5 @@ function sell_shares(account: String, company: String, amount: Number, price: Nu
 
 // List the orders for this company.
 function list_orders(company: String): Array<Order> {
-  let company = Company.byName("foo").first()
-  if (company == null) {
-    abort({ code: "no_company", message: "Company not found." })
-  }
-
-  Order.byCompany(company!).toArray()
+  Order.byCompany(lookup_company(company)).toArray()
 }
