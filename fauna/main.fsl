@@ -21,19 +21,19 @@ role account {
 
 function pay(to: Account, amount: Number): Null {
   let identity: Any = Query.identity()
-  if (identity == null) abort ({ code: "unauthorized", message: "Unauthorized" })
+  if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
 
   pay_admin(identity, to, amount)
 }
 function create_voucher(amount: Number): Null {
   let identity: Any = Query.identity()
-  if (identity == null) abort ({ code: "unauthorized", message: "Unauthorized" })
+  if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
 
   create_voucher_admin(identity, amount)
 }
 function redeem_voucher(voucher: Voucher): Null {
   let identity: Any = Query.identity()
-  if (identity == null) abort ({ code: "unauthorized", message: "Unauthorized" })
+  if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
 
   redeem_voucher_admin(identity, voucher)
 }
