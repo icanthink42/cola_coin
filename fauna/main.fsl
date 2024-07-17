@@ -78,6 +78,7 @@ function pay_user(from: String, to: String, amount: Number): Null {
 }
 
 // Get the balance of an account. Any authorized user can read any account's balance.
+@role(admin)
 function balance(user: String): Number {
   let account = Account.byDiscordId(user).first()
   if (account == null) {
