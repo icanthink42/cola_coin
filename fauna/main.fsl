@@ -9,6 +9,7 @@ collection Account {
   index byDiscordId {
     terms [.discord_id]
   }
+  unique [.discord_id]
 }
 
 collection Voucher {
