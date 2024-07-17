@@ -90,29 +90,6 @@ function redeem_voucher(voucher: Ref<Voucher>): Null {
   redeem_voucher_admin(identity, voucher!)
 }
 
-function create_user(id: String): Account {
-  if (Account.byDiscordId(id).first() != null) {
-    abort({ code: "user_exists", message: "That user is already registered." })
-  }
-
-  Account.create({ balance: 0, discord_id: id })
-}
-function create_company(creator: String, name: String, shares: Number): Account {
-  if (Company.byName(name).first() != null) {
-    abort({ code: "company_exists", message: "A company with the name #{name} already exists." })
-  }
-
-  let creator = discord_account(creator)
-
-  let share_owners = Object.fromEntries([[creator.id.toString(), shares]])
-
-  let account = Account(newId())
-
-  let company = Company.create({ name: name, account: account, share_owners: share_owners })
-  let account = Account.create({ id: account.id, balance: 0, company: company })
-
-  account
-}
 function create_token(account: Account): String {
   Token.create({ document: account }).secret!
 }
@@ -127,33 +104,6 @@ function effective_shares_owned(account: Account, company: Company): Number {
     .fold(actual_shares_owned, (acc, order) => acc - order.amount)
 }
 
-function sell_shares(account: String, company: Company, amount: Number, price: Number): Order {
-  let account = discord_account(account)
-
-  if (amount < 0) {
-    abort({ code: "invalid_amount", message: "Cannot sell a negative amount of shares." })
-  }
-  if (price < 0) {
-    abort({ code: "invalid_price", message: "Cannot sell shares for a negative price." })
-  }
-
-  let shares_owned = effective_shares_owned(account, company)
-  if (shares_owned < amount) {
-    abort({ code: "low_shares", message: "Not enough shares to sell." })
-  }
-
-  Order.create({ kind: "sell", amount: amount, price: price, company: company })
-}
-
-function list_orders(company: String): Array<Order> {
-  let company = Company.byName("foo").first()
-  if (company == null) {
-    abort({ code: "no_company", message: "Company not found." })
-  }
-
-  Order.byCompany(company!).toArray()
-}
-
 @role(admin)
 function discord_account(id: String): Account {
   let account = Account.byDiscordId(id).first()
@@ -162,19 +112,6 @@ function discord_account(id: String): Account {
   }
 
   account!
-}
-
-// Called from a slash command to pay a user from another user.
-@role(admin)
-function pay_user(from: String, to: String, amount: Number): Null {
-  pay_admin(discord_account(from), discord_account(to), amount)
-}
-
-
-// Get the balance of an account. Any authorized user can read any account's balance.
-@role(admin)
-function balance(user: String): Number {
-  discord_account(user).balance
 }
 
 function cc_str(amount: Number): String {
