@@ -2,6 +2,8 @@ collection Account {
   name: String
   balance: Number
 
+  discord_id: String
+
   check balance_positive (.balance >= 0)
 }
 
@@ -32,6 +34,13 @@ function redeem_voucher(voucher: Voucher): Null {
   if (identity == null) abort ({ code: "unauthorized", message: "Unauthorized" })
 
   redeem_voucher_admin(identity, voucher)
+}
+
+function create_user(id: String, name: String): Account {
+  Account.create({ name: name, balance: 0, discord_id: id })
+}
+function create_token(account: Account): String {
+  Token.create({ document: account }).secret!
 }
 
 function pay_admin(from: Account, to: Account, amount: Number): Null {
