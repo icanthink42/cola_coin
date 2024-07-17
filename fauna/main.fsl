@@ -1,6 +1,8 @@
 collection Account {
   name: String
   balance: Number
+
+  check balance_positive (.balance >= 0)
 }
 
 collection Voucher {
