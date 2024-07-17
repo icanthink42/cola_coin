@@ -65,7 +65,7 @@ function create_token(account: Account): String {
 function discord_account(id: String): Account {
   let account = Account.byDiscordId(id).first()
   if (account == null) {
-    abort({ code: "no_account", message: "No such account with ID #{id}" })
+    abort({ code: "no_account", message: "<@#{id}> has not registered yet. Tell them to run /register to get started!" })
   }
 
   account!
@@ -84,16 +84,39 @@ function balance(user: String): Number {
   discord_account(user).balance
 }
 
+function cc_str(amount: Number): String {
+  let amount_str = amount.toString()
+
+  let number_str = if (amount == Math.floor(amount)) {
+    amount_str + ".00"
+  } else {
+    let whole = amount_str.split(".")[0]
+    let fraction = amount_str.split(".")[1]
+
+    let fraction = if (fraction.length > 2) {
+      fraction.slice(0, 2)
+    } else if (fraction.length == 1) {
+      fraction + "0"
+    } else {
+      fraction
+    }
+
+    "#{whole}.#{fraction}"
+  }
+
+  "#{number_str}cc"
+}
+
 @role(admin)
 function pay_admin(from: Account, to: Account, amount: Number): Null {
   if (amount < 0) {
-    abort({ code: "invalid_balance", message: "Cannot pay a negative amount" })
+    abort({ code: "invalid_balance", message: "Cannot pay a negative amount!" })
   }
   if (from == to) {
-    abort({ code: "same_account", message: "Cannot pay to the same account" })
+    abort({ code: "same_account", message: "Cannot pay to the same account!" })
   }
   if (from.balance < amount) {
-    abort({ code: "low_balance", message: "Not enough balance to pay #{amount}" })
+    abort({ code: "low_balance", message: "Not enough balance to pay #{cc_str(amount)}." })
   }
 
   from.update({ balance: from.balance - amount })
