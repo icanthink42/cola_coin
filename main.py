@@ -1,3 +1,6 @@
+from itertools import product
+from discord.ui import InputText, Item
+from numpy._core.defchararray import title
 from pandas import DataFrame
 import discord
 import api
@@ -78,6 +81,73 @@ async def list_orders(ctx, company_name: str):
     else:
         await ctx.respond(error_message, ephemeral=True)
 
+class ShareholderCompanyView(discord.ui.View):
+    def __init__(self, *items: Item, timeout: float | None = 180, disable_on_timeout: bool = False, company: str):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+        self.company = company
+
+    @discord.ui.button(label="Notify Shareholders", style=discord.ButtonStyle.primary, emoji="📢")
+    async def notify_shareholders(self, _, interaction):
+        await interaction.response.send_message("You clicked the button!", ephemeral=True)
+
+    @discord.ui.button(label="Edit Products", style=discord.ButtonStyle.green, emoji="✏️")
+    async def edit_products(self, _, interaction):
+        await interaction.response.send_message(f"# {self.company}'s Products", ephemeral=True, view=EditProducts(company=self.company))
+
+    @discord.ui.button(label="Dissolve Company", style=discord.ButtonStyle.danger, emoji="🔥")
+    async def dissolve_company(self, _, interaction):
+        await interaction.response.send_message("You clicked the button!", ephemeral=True)
+
+class EditProducts(discord.ui.View):
+    def __init__(self, *items: Item, timeout: float | None = 180, disable_on_timeout: bool = False, company: str):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+        self.company = company
+
+    @discord.ui.select(
+        placeholder = "Edit a Product",
+        min_values = 1,
+        max_values = 1,
+        options = [
+            discord.SelectOption(
+                label="Example Product 1",
+                description="Neil Macneale I"
+            ),
+            discord.SelectOption(
+                label="Example Product 2",
+                description="Neil Macneale II"
+            ),
+            discord.SelectOption(
+                label="Example Product 3",
+                description="Neil Macneale III"
+            )
+        ]
+    )
+    async def select_callback(self, select, interaction):
+        await interaction.response.send_modal(EditProductModal(title=select.values[0], company=company, product=select.values[0]))
+
+    @discord.ui.button(label="Add New Product", style=discord.ButtonStyle.green, emoji="➕")
+    async def add_new_product(self, _, interaction):
+        await interaction.response.send_message("You clicked the button!", ephemeral=True)
+
+class EditProductModal(discord.ui.Modal):
+    def __init__(self, *children: InputText, title: str, custom_id: str | None = None, timeout: float | None = None, company, product) -> None:
+        super().__init__(*children, title=title, custom_id=custom_id, timeout=timeout)
+        self.company = company
+        self.product = product
+
+        self.add_item(discord.ui.InputText(label="Product Name"))
+        self.add_item(discord.ui.InputText(label="Product Description", style=discord.InputTextStyle.long))
+        self.add_item(discord.ui.InputText(label="Product Price"))
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message("This will display the new product", ephemeral=True)
+
+@bot.slash_command(guild_ids=guild_ids)
+async def company(ctx, company_name: str):
+    if True: # Check a user is a share holder
+        await ctx.respond(f"# {company_name}", ephemeral=True, view=ShareholderCompanyView(company=company_name))
+    else:
+        await ctx.respond(f"# {company_name}", ephemeral=True, view=CompanyView)
 
 with open("discord_token.txt") as f:
     token = f.read()
