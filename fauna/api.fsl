@@ -63,6 +63,25 @@ function sell_shares(account: String, company: String, amount: Number, price: Nu
   Order.create({ kind: "sell", amount: amount, price: price, company: company })
 }
 
+function buy_shares(account: String, company: String, amount: Number, price: Number): Order {
+  let account = discord_account(account)
+  let company = lookup_company(company)
+
+  if (amount < 0) {
+    abort({ code: "invalid_amount", message: "Cannot sell a negative amount of shares." })
+  }
+  if (price < 0) {
+    abort({ code: "invalid_price", message: "Cannot sell shares for a negative price." })
+  }
+
+  let value = amount * price
+  if (account.balance < value) {
+    abort({ code: "low_balance", message: "Not enough balance to buy shares." })
+  }
+
+  Order.create({ kind: "buy", amount: amount, price: price, company: company })
+}
+
 // List the orders for this company.
 function list_orders(company: String): Array<Order> {
   Order.byCompany(lookup_company(company)).toArray()
