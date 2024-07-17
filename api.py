@@ -23,3 +23,14 @@ async def balance(discord_id):
         """, discord_id=str(discord_id))).data
     except ServiceError:
         return False
+
+async def pay(from_id, to_id, amount):
+    try:
+        client.query(fql("""
+        pay_user(${from_id}, ${to_id}, ${amount})
+        """, from_id=str(from_id), to_id=str(to_id), amount=amount)).data
+        return None
+    except ServiceError as e:
+        if e.abort is None:
+            return "An internal error occured!"
+        return e.abort["message"]

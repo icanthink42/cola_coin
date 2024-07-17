@@ -29,6 +29,18 @@ async def bal(ctx, user: Option(discord.User, required=False)):
     else:
         await ctx.respond(f"{user.mention} has {balance}cc.", ephemeral=True)
 
+@bot.slash_command(guild_ids=guild_ids)
+async def pay(ctx, user: discord.User, amount: float):
+    error_message = await api.pay(ctx.user.id, user.id, amount)
+    if error_message is None:
+        await ctx.respond(f"Paid {user.mention} {amount}cc.", ephemeral=True)
+        try:
+            await user.send(f"{ctx.user.mention} paid you {amount}cc!") # TODO: Error handling
+        except discord.errors.Forbidden:
+            pass
+    else:
+        await ctx.respond(error_message, ephemeral=True)
+
 with open("discord_token.txt") as f:
     token = f.read()
 
