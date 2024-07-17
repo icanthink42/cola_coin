@@ -76,7 +76,7 @@ async def company(ctx, company_name: str):
     if True: # Check a user is a share holder
         await ctx.respond(f"# {company_name}", ephemeral=True, view=ui.ShareholderCompanyView(company=company_name))
     else:
-        await ctx.respond(f"# {company_name}", ephemeral=True, view=CompanyView)
+        await ctx.respond(f"# {company_name}", ephemeral=True, view=ui.CompanyView(company=company_name))
 
 with open("discord_token.txt") as f:
     token = f.read()

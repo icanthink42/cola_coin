@@ -8,15 +8,15 @@ class OrderListType(discord.ui.View):
         super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
         self.company = company
 
-    @discord.ui.button(label="Sell", style=discord.ButtonStyle.primary, emoji="📢")
+    @discord.ui.button(label="Sell", style=discord.ButtonStyle.primary, emoji="📉")
     async def sell(self, _, interaction):
         await respond_list_orders(interaction, company_name=self.company, list_type="sell")
 
-    @discord.ui.button(label="Buy", style=discord.ButtonStyle.green, emoji="✏️")
+    @discord.ui.button(label="Buy", style=discord.ButtonStyle.green, emoji="📈")
     async def buy(self, _, interaction):
         await respond_list_orders(interaction, company_name=self.company, list_type="buy")
 
-    @discord.ui.button(label="All", style=discord.ButtonStyle.danger, emoji="🔥")
+    @discord.ui.button(label="All", style=discord.ButtonStyle.danger, emoji="📊")
     async def all(self, _, interaction):
         await respond_list_orders(interaction, company_name=self.company, list_type="all")
 
@@ -52,7 +52,11 @@ class ShareholderCompanyView(discord.ui.View):
         super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
         self.company = company
 
-    @discord.ui.button(label="Notify Shareholders", style=discord.ButtonStyle.primary, emoji="📢")
+    @discord.ui.button(label="View Share Orders", style=discord.ButtonStyle.primary, emoji="📈")
+    async def view_share_orders(self, _, interaction):
+        await interaction.respond(f"# {self.company}", ephemeral=True, view=OrderListType(company=self.company))
+
+    @discord.ui.button(label="Notify Shareholders", style=discord.ButtonStyle.secondary, emoji="📢")
     async def notify_shareholders(self, _, interaction):
         await interaction.response.send_modal(NotifyShareholdersModal(title=f"{self.company} Notify", company=self.company))
 
@@ -63,6 +67,20 @@ class ShareholderCompanyView(discord.ui.View):
     @discord.ui.button(label="Dissolve Company", style=discord.ButtonStyle.danger, emoji="🔥")
     async def dissolve_company(self, _, interaction):
         await interaction.response.send_message("You clicked the button!", ephemeral=True)
+
+class CompanyView(discord.ui.View):
+    def __init__(self, *items: Item, timeout: float | None = 180, disable_on_timeout: bool = False, company: str):
+        super().__init__(*items, timeout=timeout, disable_on_timeout=disable_on_timeout)
+        self.company = company
+
+    @discord.ui.button(label="View Share Orders", style=discord.ButtonStyle.primary, emoji="📈")
+    async def view_share_orders(self, _, interaction):
+        await interaction.respond(f"# {self.company}", ephemeral=True, view=OrderListType(company=self.company))
+
+    @discord.ui.button(label="View Products", style=discord.ButtonStyle.green, emoji="📦")
+    async def view_products(self, _, interaction):
+        await interaction.response.send_message(f"# {self.company}'s Products", ephemeral=True, view=EditProducts(company=self.company))
+
 
 class NotifyShareholdersModal(discord.ui.Modal):
     def __init__(self, *children: InputText, title: str, custom_id: str | None = None, timeout: float | None = None, company) -> None:
