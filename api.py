@@ -8,11 +8,18 @@ with open("fauna_token.txt") as f:
 client = Client(secret=token)
 
 async def create_user(discord_id, account_name):
-    discord_id = str(discord_id)
     try:
         client.query(fql("""
         create_user(${discord_id}, ${account_name})
-        """, discord_id=discord_id, account_name=account_name))
+        """, discord_id=str(discord_id), account_name=account_name))
     except ServiceError:
         return False
     return True
+
+async def balance(discord_id):
+    try:
+        return client.query(fql("""
+        balance(${discord_id})
+        """, discord_id=str(discord_id))).data
+    except ServiceError:
+        return False
