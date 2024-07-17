@@ -15,6 +15,8 @@ role account {
   privileges pay { call }
   privileges create_voucher { call }
   privileges redeem_voucher { call }
+
+  membership Account
 }
 
 function pay(to: Account, amount: Number): Null {
@@ -43,6 +45,7 @@ function create_token(account: Account): String {
   Token.create({ document: account }).secret!
 }
 
+@role(admin)
 function pay_admin(from: Account, to: Account, amount: Number): Null {
   if (from.balance < amount) {
     abort({ code: "low_balance", message: "Not enough balance to pay #{amount}" })
@@ -52,6 +55,8 @@ function pay_admin(from: Account, to: Account, amount: Number): Null {
   to.update({ balance: to.balance + amount })
   null
 }
+
+@role(admin)
 function create_voucher_admin(from: Account, amount: Number): Null {
   if (from.balance < amount) {
     abort({ code: "low_balance", message: "Not enough balance to create a voucher of #{amount}" })
@@ -61,6 +66,8 @@ function create_voucher_admin(from: Account, amount: Number): Null {
   Voucher.create({ amount: amount })
   null
 }
+
+@role(admin)
 function redeem_voucher_admin(from: Account, voucher: Voucher): Null {
   from.update({ balance: from.balance + voucher.amount })
   voucher.delete()
