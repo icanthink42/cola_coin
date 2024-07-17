@@ -7,11 +7,11 @@ with open("fauna_token.txt") as f:
 
 client = Client(secret=token)
 
-async def create_user(discord_id, account_name):
+async def create_user(discord_id):
     try:
         client.query(fql("""
-        create_user(${discord_id}, ${account_name})
-        """, discord_id=str(discord_id), account_name=account_name))
+        create_user(${discord_id})
+        """, discord_id=str(discord_id)))
     except ServiceError:
         return False
     return True
@@ -32,5 +32,41 @@ async def pay(from_id, to_id, amount):
         return None
     except ServiceError as e:
         if e.abort is None:
+            print(e)
             return "An internal error occured!"
         return e.abort["message"]
+
+async def create_company(owner, name, shares):
+    try:
+        client.query(fql("""
+        create_company(${owner}, ${name}, ${shares})
+        """, owner=str(owner), name=str(name), shares=shares)).data
+        return None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return "An internal error occured!"
+        return e.abort["message"]
+
+async def sell_shares(owner, company_name, shares, price):
+    try:
+        client.query(fql("""
+        sell_shares(${owner}, ${company_name}, ${shares}, ${price})
+        """, owner=str(owner), company_name=str(company_name), shares=shares, price=price)).data
+        return None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return "An internal error occured!"
+        return e.abort["message"]
+
+async def list_orders(company_name):
+    try:
+        return client.query(fql("""
+        list_orders(${company_name})
+        """, company_name=str(company_name))).data, None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return None, "An internal error occured!"
+        return None, e.abort["message"]
