@@ -1,5 +1,4 @@
 collection Account {
-  name: String
   balance: Number
 
   discord_id: String?
@@ -15,6 +14,7 @@ collection Account {
 }
 
 collection Company {
+  name: String
   account: Ref<Account>
   share_owners: { *: Number }
 
@@ -25,6 +25,7 @@ collection Company {
     Object.keys(doc.share_owners).every(x => Account(ID(x)).exists())
   })
 
+  unique [.name]
   unique [.account]
 }
 
@@ -70,8 +71,8 @@ function redeem_voucher(voucher: Ref<Voucher>): Null {
   redeem_voucher_admin(identity, voucher!)
 }
 
-function create_user(id: String, name: String): Account {
-  Account.create({ name: name, balance: 0, discord_id: id })
+function create_user(id: String): Account {
+  Account.create({ balance: 0, discord_id: id })
 }
 function create_company(creator: String, name: String, shares: Number): Account {
   let creator = discord_account(creator)
@@ -80,8 +81,8 @@ function create_company(creator: String, name: String, shares: Number): Account 
 
   let account = Account(newId())
 
-  let company = Company.create({ account: account, share_owners: share_owners })
-  let account = Account.create({ id: account.id, name: name, balance: 0, company: company })
+  let company = Company.create({ name: name, account: account, share_owners: share_owners })
+  let account = Account.create({ id: account.id, balance: 0, company: company })
 
   account
 }
