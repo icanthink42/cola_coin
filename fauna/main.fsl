@@ -78,6 +78,12 @@ function pay_user(from: String, to: String, amount: Number): Null {
 
 @role(admin)
 function pay_admin(from: Account, to: Account, amount: Number): Null {
+  if (amount < 0) {
+    abort({ code: "invalid_balance", message: "Cannot pay a negative amount" })
+  }
+  if (from == to) {
+    abort({ code: "same_account", message: "Cannot pay to the same account" })
+  }
   if (from.balance < amount) {
     abort({ code: "low_balance", message: "Not enough balance to pay #{amount}" })
   }
@@ -89,6 +95,9 @@ function pay_admin(from: Account, to: Account, amount: Number): Null {
 
 @role(admin)
 function create_voucher_admin(from: Account, amount: Number): Null {
+  if (amount < 0) {
+    abort({ code: "invalid_balance", message: "Cannot create a voucher with a negative amount" })
+  }
   if (from.balance < amount) {
     abort({ code: "low_balance", message: "Not enough balance to create a voucher of #{amount}" })
   }
