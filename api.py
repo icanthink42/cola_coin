@@ -60,6 +60,18 @@ async def sell_shares(owner, company_name, shares, price):
             return "An internal error occured!"
         return e.abort["message"]
 
+async def buy_shares(owner, company_name, shares, price):
+    try:
+        client.query(fql("""
+        buy_shares(${owner}, ${company_name}, ${shares}, ${price})
+        """, owner=str(owner), company_name=str(company_name), shares=shares, price=price)).data
+        return None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return "An internal error occured!"
+        return e.abort["message"]
+
 async def list_orders(company_name):
     try:
         return client.query(fql("""
