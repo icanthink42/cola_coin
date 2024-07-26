@@ -69,8 +69,6 @@ role account {
 
 @role(admin)
 function pay(to: Ref<Account>, amount: Number): Null {
-  let to: Ref<Account> = to // FIXME: Remove once typechecking bug is fixed.
-
   let identity: Any = Query.identity()
   if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
   if (!to.exists()) abort({ code: "no_account", message: "The account doesn't exist" })
@@ -79,8 +77,6 @@ function pay(to: Ref<Account>, amount: Number): Null {
 }
 
 function effective_shares_owned(account: Account, company: Company): Number {
-  let company: Company = company // FIXME
-
   let actual_shares_owned = company.share_owners[account.id.toString()] ?? 0
 
   Order.byCompany(company)
