@@ -2,6 +2,7 @@ collection Account {
   balance: Number
 
   discord_id: String?
+  discord_name: String?
   company: Ref<Company>?
 
   check balance_positive (.balance >= 0)
@@ -56,6 +57,12 @@ role account {
   privileges pay { call }
   privileges create_voucher { call }
   privileges redeem_voucher { call }
+
+  privileges Account {
+    read {
+      predicate (.id == Query.identity()?.id)
+    }
+  }
 
   membership Account
 }

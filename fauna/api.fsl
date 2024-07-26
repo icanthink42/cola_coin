@@ -2,12 +2,12 @@
 
 // Create a user account.
 @role(admin)
-function create_user(id: String): Account {
+function create_user(id: String, name: String): Account {
   if (Account.byDiscordId(id).first() != null) {
     abort({ code: "user_exists", message: "That user is already registered." })
   }
 
-  Account.create({ balance: 0, discord_id: id })
+  Account.create({ balance: 0, discord_id: id, discord_name: name })
 }
 
 // Called from a slash command to pay a user from another user.
