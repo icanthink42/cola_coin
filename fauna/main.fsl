@@ -157,8 +157,11 @@ function create_voucher_admin(from: Account, amount: Number): Voucher {
 }
 
 @role(admin)
-function redeem_voucher_admin(from: Account, voucher: Voucher): Null {
+function redeem_voucher_admin(from: Account, voucher: Voucher): Number {
+  let amount = voucher.amount
+
   from.update({ balance: from.balance + voucher.amount })
   voucher.delete()
-  null
+
+  amount
 }

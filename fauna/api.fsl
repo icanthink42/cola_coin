@@ -102,7 +102,7 @@ function create_voucher(amount: Number): { id: ID, amount: Number } {
 }
 
 @role(admin)
-function redeem_voucher(voucher: Ref<Voucher>): Null {
+function redeem_voucher(voucher: Ref<Voucher>): Number {
   let identity: Any = Query.identity()
   if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
   if (!voucher.exists()) abort({ code: "no_voucher", message: "The voucher doesn't exist" })
