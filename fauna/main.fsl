@@ -78,25 +78,6 @@ function pay(to: Ref<Account>, amount: Number): Null {
   pay_admin(identity, to!, amount)
 }
 
-@role(admin)
-function create_voucher(amount: Number): Null {
-  let identity: Any = Query.identity()
-  if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
-
-  create_voucher_admin(identity, amount)
-}
-
-@role(admin)
-function redeem_voucher(voucher: Ref<Voucher>): Null {
-  let voucher: Ref<Voucher> = voucher // FIXME: Remove once typechecking bug is fixed.
-
-  let identity: Any = Query.identity()
-  if (identity == null) abort({ code: "unauthorized", message: "Unauthorized" })
-  if (!voucher.exists()) abort({ code: "no_voucher", message: "The voucher doesn't exist" })
-
-  redeem_voucher_admin(identity, voucher!)
-}
-
 function effective_shares_owned(account: Account, company: Company): Number {
   let company: Company = company // FIXME
 
@@ -167,7 +148,7 @@ function pay_admin(from: Account, to: Account, amount: Number): Null {
 }
 
 @role(admin)
-function create_voucher_admin(from: Account, amount: Number): Null {
+function create_voucher_admin(from: Account, amount: Number): Voucher {
   if (amount < 0) {
     abort({ code: "invalid_balance", message: "Cannot create a voucher with a negative amount" })
   }
@@ -177,7 +158,6 @@ function create_voucher_admin(from: Account, amount: Number): Null {
 
   from.update({ balance: from.balance - amount })
   Voucher.create({ amount: amount })
-  null
 }
 
 @role(admin)
