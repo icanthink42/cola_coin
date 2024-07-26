@@ -90,6 +90,10 @@ function list_orders(company: String): Array<Order> {
 function create_token(account: String): String {
   let account = discord_account(account)
 
+  // Wipe out any old tokens.
+  Token.byDocument(account).forEach(.delete())
+
+  // Make a new token.
   Token.create({ document: account }).secret!
 }
 
