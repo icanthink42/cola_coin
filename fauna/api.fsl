@@ -86,3 +86,9 @@ function buy_shares(account: String, company: String, amount: Number, price: Num
 function list_orders(company: String): Array<Order> {
   Order.byCompany(lookup_company(company)).toArray()
 }
+
+function create_token(account: String): String {
+  let account = discord_account(account)
+
+  Token.create({ document: account }).secret!
+}
