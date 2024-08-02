@@ -53,7 +53,7 @@ async def baltop(ctx, number: Option(int, required=False)):
         for user in data:
             if "company" in user:
                 continue
-            out += f"\n - {user["discord_name"]}: {user["balance"]}"
+            out += f"\n - {user['discord_name']}: {user['balance']}"
         await ctx.respond(out, ephemeral=True)
     else:
         await ctx.respond(error_message, ephemeral=True)
