@@ -26,6 +26,10 @@ function balance(user: String): Number {
 // Return the top N balances.
 @role(admin)
 function top_balances(amount: Number): Array<Account> {
+  if (amount <= 0) {
+    abort({ code: "invalid_amount", message: "Cannot list a negative amount." })
+  }
+
   Account.byBalance().take(amount).toArray()
 }
 
