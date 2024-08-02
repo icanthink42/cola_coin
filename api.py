@@ -104,3 +104,6 @@ async def top_balances(number):
             print(e)
             return None, "An internal error occured!"
         return None, e.abort["message"]
+
+async def daily_increase():
+    client.query(fql("daily_increase()"));
