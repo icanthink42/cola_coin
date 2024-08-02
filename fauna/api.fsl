@@ -7,7 +7,7 @@ function create_user(id: String, name: String): Account {
     abort({ code: "user_exists", message: "That user is already registered." })
   }
 
-  Account.create({ balance: 0, discord_id: id, discord_name: name })
+  Account.create({ balance: 1000, discord_id: id, discord_name: name })
 }
 
 // Called from a slash command to pay a user from another user.
