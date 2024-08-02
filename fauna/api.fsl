@@ -23,6 +23,12 @@ function balance(user: String): Number {
   discord_account(user).balance
 }
 
+// Return the top N balances.
+@role(admin)
+function top_balances(amount: Number): Array<Account> {
+  Account.byBalance().take(amount).toArray()
+}
+
 // === Company functions ===
 
 // Create a company.

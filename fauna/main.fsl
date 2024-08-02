@@ -12,6 +12,10 @@ collection Account {
     terms [.discord_id]
   }
   unique [.discord_id, .company]
+
+  index byBalance {
+    values [desc(.balance)]
+  }
 }
 
 collection Company {
