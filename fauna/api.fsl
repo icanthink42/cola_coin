@@ -33,6 +33,16 @@ function top_balances(amount: Number): Array<Account> {
   Account.byBalance().take(amount).toArray()
 }
 
+// Increase all balances by 5.
+@role(admin)
+function daily_increase(): Null {
+  Account.all().forEach(account => {
+    let account: Any = account
+    account.update({ balance: account.balance + 5 })
+  })
+  null
+}
+
 // === Company functions ===
 
 // Create a company.
