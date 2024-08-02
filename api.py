@@ -93,3 +93,14 @@ async def create_token(discord_id):
             print(e)
             return None, "An internal error occured!"
         return None, e.abort["message"]
+
+async def top_balances(number):
+    try:
+        return client.query(fql("""
+        top_balances(${number})
+        """, number=number)).data, None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return None, "An internal error occured!"
+        return None, e.abort["message"]

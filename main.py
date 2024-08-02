@@ -43,6 +43,21 @@ async def pay(ctx, user: discord.User, amount: float):
     else:
         await ctx.respond(error_message, ephemeral=True)
 
+@bot.slash_command(guild_ids=guild_ids)
+async def baltop(ctx, number: Option(int, required=False)):
+    if number is None:
+        number = 10
+    data, error_message = await api.top_balances(number)
+    if error_message is None and data is not None:
+        out = f"# Top {number} User Balances"
+        for user in data:
+            if "company" in user:
+                continue
+            out += f"\n - {user["discord_name"]}: {user["balance"]}"
+        await ctx.respond(out, ephemeral=True)
+    else:
+        await ctx.respond(error_message, ephemeral=True)
+
 # @bot.slash_command(guild_ids=guild_ids)
 # async def create_company(ctx, name: str, shares: int):
 #     error_message = await api.create_company(ctx.user.id, name, shares)
