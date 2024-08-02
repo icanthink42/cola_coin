@@ -145,7 +145,7 @@ function pay_admin(from: Account, to: Account, amount: Number): Null {
 
 @role(admin)
 function create_voucher_admin(from: Account, amount: Number): Voucher {
-  if (amount < 0) {
+  if (amount <= 0) {
     abort({ code: "invalid_balance", message: "Cannot create a voucher with a negative amount" })
   }
   if (from.balance < amount) {
