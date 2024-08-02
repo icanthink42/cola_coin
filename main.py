@@ -16,7 +16,7 @@ async def on_ready():
 
 @bot.slash_command(guild_ids=guild_ids)
 async def register(ctx):
-    if await api.create_user(ctx.user.id):
+    if await api.create_user(ctx.user.id, ctx.user.name):
         await ctx.respond("Account created!", ephemeral=True)
     else:
         await ctx.respond("You've already created an account!", ephemeral=True)
@@ -77,6 +77,14 @@ async def company(ctx, company_name: str):
         await ctx.respond(f"# {company_name}", ephemeral=True, view=ui.ShareholderCompanyView(company=company_name))
     else:
         await ctx.respond(f"# {company_name}", ephemeral=True, view=ui.CompanyView(company=company_name))
+
+@bot.slash_command(guild_ids=guild_ids)
+async def create_token(ctx):
+    auth_token, error_message = await api.create_token(ctx.user.id)
+    if error_message is None:
+        await ctx.respond(f"Created new auth token:\n\n||{auth_token}||", ephemeral=True)
+    else:
+        await ctx.respond(error_message, ephemeral=True)
 
 with open("discord_token.txt") as f:
     token = f.read()

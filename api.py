@@ -7,11 +7,11 @@ with open("fauna_token.txt") as f:
 
 client = Client(secret=token)
 
-async def create_user(discord_id):
+async def create_user(discord_id, name):
     try:
         client.query(fql("""
-        create_user(${discord_id})
-        """, discord_id=str(discord_id)))
+        create_user(${discord_id}, ${name})
+        """, discord_id=str(discord_id), name=name))
     except ServiceError:
         return False
     return True
@@ -77,6 +77,17 @@ async def list_orders(company_name):
         return client.query(fql("""
         list_orders(${company_name})
         """, company_name=str(company_name))).data, None
+    except ServiceError as e:
+        if e.abort is None:
+            print(e)
+            return None, "An internal error occured!"
+        return None, e.abort["message"]
+
+async def create_token(discord_id):
+    try:
+        return client.query(fql("""
+        create_token(${discord_id})
+        """, discord_id=str(discord_id))).data, None
     except ServiceError as e:
         if e.abort is None:
             print(e)
